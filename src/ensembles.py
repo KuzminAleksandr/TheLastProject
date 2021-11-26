@@ -13,7 +13,7 @@ class RandomForestRMSE:
             bagging_fraction: float = None,
             feature_subsample_size: float = None,
             **trees_parameters
-    ):
+    ) -> None:
         """
         n_estimators : int
             The number of trees in the forest.
@@ -41,7 +41,7 @@ class RandomForestRMSE:
 
         self.estimators = []
 
-    def fit(self, X, y, X_val=None, y_val=None, trace=False, verbose=False):
+    def fit(self, X, y, X_val=None, y_val=None, trace=True, verbose=False) -> None or tuple:
         """
         X : numpy ndarray
             Array of size n_objects, n_features
@@ -52,7 +52,7 @@ class RandomForestRMSE:
         y_val : numpy ndarray
             Array of size n_val_objects
         trace : bool
-            Return of no results of training stage. False by default.
+            Return of no results of training stage. True by default.
         verbose : bool
             Whether to print or no intermediate results. False by default.
         """
@@ -65,8 +65,9 @@ class RandomForestRMSE:
         val_metric = []
 
         for i in trange(self.n_estimators):
+            # Measure training time
             start_time = time()
-            ###------Measure training time------###
+
             estimator = DecisionTreeRegressor(
                 max_depth=self.max_depth,
                 max_features=self.feature_subsample_size,
@@ -78,35 +79,38 @@ class RandomForestRMSE:
                 size=[int(self.bagging_fraction * X.shape[0])]
             )
             estimator.fit(X[new_idx], y[new_idx])
-            ###---------------------------------###
+
+            self.estimators.append(estimator)
             train_time.append(time() - start_time)
-            if verbose:
-                print(f"Время тренировки {i}-ого дерева: {train_time[-1]: .3f} c.")
-            ###------Measure evaluation time------###
-            if X_val is not None:
+
+            if val_preds is not None:
+                # Measure evaluation time
                 start_time = time()
+
                 preds = estimator.predict(X_val)
                 val_preds += preds
                 val_time.append(time() - start_time)
+
                 rmse_estimator = self.get_metric(preds, y_val)
                 val_metric.append(rmse_estimator)
-                if verbose:
+
+            if verbose:
+                print(f"Время тренировки {i}-ого дерева: {train_time[-1]: .3f} c.")
+                if val_preds is not None:
                     print(f"Время валидации {i}-ого дерева: {val_time[-1]: .3f} c.")
                     print(f"RMSE на валидационной выборке для {i}-ого дерева: {rmse_estimator: .3f}")
-                    print("#------------------------------#")
-            ###---------------------------------- ###
-            self.estimators.append(estimator)
+                print("#------------------------------#")
 
-        ###------Print results of experiments------###
+        # Print results of experiments
         self.print_results(val_preds, y_val, train_time)
 
-        ###------Return statistics------###
+        # Return training statistics
         if trace:
             return val_preds, rmse_estimator, train_time
         else:
             return
 
-    def predict(self, X):
+    def predict(self, X) -> np.ndarray:
         """
         X : numpy ndarray
             Array of size n_objects, n_features
@@ -122,11 +126,17 @@ class RandomForestRMSE:
         return preds
 
     @staticmethod
-    def get_metric(y_preds, y_true):
+    def get_metric(y_preds, y_true) -> float:
+        """
+        Return RMSE.
+        """
         return np.mean((y_preds - y_true) ** 2) ** 0.5
 
-    def print_results(self, val_preds, y_val, train_time):
-        print(f"Метод: Bagging")
+    def print_results(self, val_preds, y_val, train_time) -> None:
+        """
+        Print training results
+        """
+        print(f"Метод: Random Forest")
         print(f"Параметры:")
         print(f"|-> Число деревьев: {self.n_estimators}")
         print(f"|-> Макс. глубина дерева: {self.max_depth}")
@@ -140,9 +150,13 @@ class RandomForestRMSE:
 
 class GradientBoostingRMSE:
     def __init__(
-            self, n_estimators, learning_rate=0.1, max_depth=5, feature_subsample_size=None,
+            self,
+            n_estimators: int,
+            learning_rate: float = 0.1,
+            max_depth: int = 5,
+            feature_subsample_size: float = None,
             **trees_parameters
-    ):
+    ) -> None:
         """
         n_estimators : int
             The number of trees in the forest.
@@ -153,18 +167,98 @@ class GradientBoostingRMSE:
         feature_subsample_size : float
             The size of feature set for each tree. If None then use one-third of all features.
         """
-        pass
+        self.max_depth = max_depth
+        self.learning_rate = learning_rate
+        self.n_estimators = n_estimators
+        self.trees_parameters = trees_parameters
+        if feature_subsample_size is not None:
+            self.feature_subsample_size = feature_subsample_size
+        else:
+            self.feature_subsample_size = 1 / 3
 
-    def fit(self, X, y, X_val=None, y_val=None):
+        self.estimators = []
+        self.alphas = []
+
+    def fit(self, X, y, X_val=None, y_val=None, trace=True, verbose=False) -> None or tuple:
         """
         X : numpy ndarray
             Array of size n_objects, n_features
         y : numpy ndarray
             Array of size n_objects
+        X_val : numpy ndarray
+            Array of size n_val_objects, n_features
+        y_val : numpy ndarray
+            Array of size n_val_objects
+        trace : bool
+            Return of no results of training stage. True by default.
+        verbose : int
+            How often print intermediate results. Higher more often. 0 by default.
         """
-        pass
+        current_preds_train = np.zeros_like(y)
 
-    def predict(self, X):
+        metric_train = []
+        train_time = []
+
+        current_preds_val = None
+        metric_val = None
+        if y_val is not None:
+            current_preds_val = np.zeros_like(y_val)
+            metric_val = []
+
+        for i in range(self.n_estimators):
+            # Measure training time
+            start_time = time()
+
+            estimator = DecisionTreeRegressor(
+                max_depth=self.max_depth,
+                max_features=self.feature_subsample_size,
+                **self.trees_parameters
+            )
+
+            # Approximate anti-gradient
+            current_antigradient = self.get_antigradient(current_preds_train, y)
+            estimator.fit(X, current_antigradient)
+            preds = estimator.predict(X)
+
+            # Find alpha
+            minimizer = minimize_scalar(
+                self.alpha_optimize,
+                method="bounded",
+                bounds=[0, 10],
+                args=(current_preds_train, self.learning_rate, preds, y)
+            )
+            alpha = minimizer.x
+
+            train_time.append(time() - start_time)
+
+            # Save model and alpha
+            self.estimators.append(estimator)
+            self.alphas.append(alpha)
+
+            # Save metric stats
+            current_preds_train += alpha * self.learning_rate * preds
+            metric_train.append(self.get_metric(current_preds_train, y))
+
+            if current_preds_val is not None:
+                current_preds_val += alpha * self.learning_rate * estimator.predict(X_val)
+                metric_val.append(self.get_metric(current_preds_val, y_val))
+
+            if verbose and i % verbose == 0:
+                print(f"Время тренировки {i}-ого дерева: {train_time[-1]: .3f}")
+                print(f"RMSE на тренировочной выборке для бустинга из {i + 1} дерева: {metric_train[-1]: .3f}")
+                if current_preds_val is not None:
+                    print(f"RMSE на валидационной выборке для бустинга из {i + 1} дерева: {metric_val[-1]: .3f}")
+                print("#------------------------------------------------------#")
+
+        # Print results of experiments
+        self.print_results(metric_train[-1], train_time, current_preds_val, y_val)
+
+        if trace:
+            return metric_train, train_time, metric_val
+        else:
+            return
+
+    def predict(self, X) -> np.ndarray:
         """
         X : numpy ndarray
             Array of size n_objects, n_features
@@ -173,4 +267,52 @@ class GradientBoostingRMSE:
         y : numpy ndarray
             Array of size n_objects
         """
-        pass
+        prediction = np.zeros(shape=[X.shape[0], 1])
+        for estimator, alpha in zip(self.estimators, self.alphas):
+            prediction += self.learning_rate * estimator * alpha
+
+        return prediction
+
+    @staticmethod
+    def get_antigradient(y_preds, y_true) -> np.ndarray:
+        """
+        Return anti-gradient for MSE.
+        """
+        return y_true - y_preds
+
+    @staticmethod
+    def alpha_optimize(
+            alpha,
+            prev_preds,
+            learning_rate,
+            cur_pred,
+            y_true
+    ) -> float:
+        """
+        Function for one-dimension optimization of alpha
+        alpha : float
+            Scalar for optimization.
+        """
+        upd_pred = prev_preds + learning_rate * alpha * cur_pred
+        return np.mean((upd_pred - y_true) ** 2)
+
+    @staticmethod
+    def get_metric(y_preds, y_true) -> float:
+        """
+        Return RMSE.
+        """
+        return np.mean((y_preds - y_true) ** 2) ** 0.5
+
+    def print_results(self, train_metric,  train_time, val_preds, y_val) -> None:
+        """
+        Print training results
+        """
+        print(f"Метод: Gradient Boosting")
+        print(f"Параметры:")
+        print(f"|-> Число деревьев: {self.n_estimators}")
+        print(f"|-> Макс. глубина дерева: {self.max_depth}")
+        print(f"|-> Размерность пространства признаков: {self.feature_subsample_size: .3f}")
+        print(f"Время тренировки ансамбля: {np.sum(train_time): .2f} c.")
+        print(f"RMSE бустинга на тренировке: {train_metric: .3f}")
+        if val_preds is not None:
+            print(f"RMSE бустинга на валидации: {self.get_metric(val_preds, y_val): .3f}")
