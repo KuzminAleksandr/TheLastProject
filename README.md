@@ -27,12 +27,12 @@
 ```angular2html
 *
 |
-| --> src
+| --> src/
 |       | --> ensembles.py
 |       |       | --> RandomForestRMSE
 |       |       | --> GradientBoostingRMSE
 |
-| --> scripts
+| --> scripts/
 |       | --> build.sh
 |       | --> run.sh
 |
