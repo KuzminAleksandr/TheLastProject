@@ -20,7 +20,7 @@ class RandomForestRMSE:
         max_depth : int
             The maximum depth of the tree. If None then there is no limits.
         bagging_fraction : float
-            The fraction of dataset used for bagging. If None is 0.66.
+            The fraction of dataset used for bagging. If None is 1.0.
         feature_subsample_size : float
             The size of feature set for each tree. If None then use one-third of all features.
         """
@@ -35,13 +35,13 @@ class RandomForestRMSE:
         if bagging_fraction is not None:
             self.bagging_fraction = bagging_fraction
         else:
-            self.bagging_fraction = 0.66
+            self.bagging_fraction = 1
 
         self.trees_parameters = trees_parameters
 
         self.estimators = []
 
-    def fit(self, X, y, X_val=None, y_val=None, trace=True, verbose=False) -> None or tuple:
+    def fit(self, X, y, X_val=None, y_val=None, trace=True, verbose=0) -> None or tuple:
         """
         X : numpy ndarray
             Array of size n_objects, n_features
@@ -53,8 +53,8 @@ class RandomForestRMSE:
             Array of size n_val_objects
         trace : bool
             Return of no results of training stage. True by default.
-        verbose : bool
-            Whether to print or no intermediate results. False by default.
+        verbose : int
+            How often print intermediate results. Lower more often. 0 by default.
         """
         val_preds = None
         if X_val is not None:
@@ -91,14 +91,14 @@ class RandomForestRMSE:
                 val_preds += preds
                 val_time.append(time() - start_time)
 
-                rmse_estimator = self.get_metric(preds, y_val)
+                rmse_estimator = self.get_metric(preds / (i + 1), y_val)
                 val_metric.append(rmse_estimator)
 
-            if verbose:
+            if verbose and i % verbose == 0:
                 print(f"Время тренировки {i}-ого дерева: {train_time[-1]: .3f} c.")
                 if val_preds is not None:
                     print(f"Время валидации {i}-ого дерева: {val_time[-1]: .3f} c.")
-                    print(f"RMSE на валидационной выборке для {i}-ого дерева: {rmse_estimator: .3f}")
+                    print(f"RMSE на валидационной выборке для композиции из {i + 1} деревьев: {rmse_estimator: .3f}")
                 print("#------------------------------#")
 
         # Print results of experiments
@@ -179,7 +179,7 @@ class GradientBoostingRMSE:
         self.estimators = []
         self.alphas = []
 
-    def fit(self, X, y, X_val=None, y_val=None, trace=True, verbose=False) -> None or tuple:
+    def fit(self, X, y, X_val=None, y_val=None, trace=True, verbose=0) -> None or tuple:
         """
         X : numpy ndarray
             Array of size n_objects, n_features
@@ -192,7 +192,7 @@ class GradientBoostingRMSE:
         trace : bool
             Return of no results of training stage. True by default.
         verbose : int
-            How often print intermediate results. Higher more often. 0 by default.
+            How often print intermediate results. Lower more often. 0 by default.
         """
         current_preds_train = np.zeros_like(y)
 
@@ -233,7 +233,7 @@ class GradientBoostingRMSE:
 
             # Save model and alpha
             self.estimators.append(estimator)
-            self.alphas.append(alpha)
+            self.alphas.append(alpha * self.learning_rate)
 
             # Save metric stats
             current_preds_train += alpha * self.learning_rate * preds
@@ -245,7 +245,7 @@ class GradientBoostingRMSE:
 
             if verbose and i % verbose == 0:
                 print(f"Время тренировки {i}-ого дерева: {train_time[-1]: .3f}")
-                print(f"RMSE на тренировочной выборке для бустинга из {i + 1} дерева: {metric_train[-1]: .3f}")
+                print(f"RMSE на тренировочной выборке для бустинга из {i} дерева: {metric_train[-1]: .3f}")
                 if current_preds_val is not None:
                     print(f"RMSE на валидационной выборке для бустинга из {i + 1} дерева: {metric_val[-1]: .3f}")
                 print("#------------------------------------------------------#")
@@ -293,7 +293,7 @@ class GradientBoostingRMSE:
         alpha : float
             Scalar for optimization.
         """
-        upd_pred = prev_preds + learning_rate * alpha * cur_pred
+        upd_pred = prev_preds + alpha * cur_pred
         return np.mean((upd_pred - y_true) ** 2)
 
     @staticmethod
