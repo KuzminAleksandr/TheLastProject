@@ -25,6 +25,8 @@ class RandomForestRMSE:
             The size of feature set for each tree. If None then use one-third of all features.
         """
         self.n_estimators = n_estimators
+        if n_estimators is None:
+            self.n_estimators = 100
         self.max_depth = max_depth
 
         if feature_subsample_size is not None:
@@ -90,8 +92,8 @@ class RandomForestRMSE:
             self.estimators.append(estimator)
             train_time.append(time() - start_time)
 
-            train_preds += estimator.predict(X[new_idx][:, features])
-            train_metric.append(self.get_metric(train_preds / (i + 1), y[new_idx]))
+            train_preds += estimator.predict(X[:, features])
+            train_metric.append(self.get_metric(train_preds / (i + 1), y))
 
             if val_preds is not None:
                 # Measure evaluation time
@@ -120,6 +122,7 @@ class RandomForestRMSE:
         else:
             return
 
+
     def predict(self, X) -> np.ndarray:
         """
         X : numpy ndarray
@@ -129,7 +132,7 @@ class RandomForestRMSE:
         y : numpy ndarray
             Array of size n_objects
         """
-        preds = np.zeros(size=[X.shape[0], 1])
+        preds = np.zeros(shape=[X.shape[0], 1])
         ran = np.arange(0, X.shape[1])
         for i, estimator in enumerate(self.estimators):
             rand_gen = np.random.RandomState(i)
@@ -183,7 +186,12 @@ class GradientBoostingRMSE:
         """
         self.max_depth = max_depth
         self.learning_rate = learning_rate
+        if learning_rate is None:
+            self.learning_rate = 0.1
+
         self.n_estimators = n_estimators
+        if n_estimators is None:
+            self.n_estimators = 100
         self.trees_parameters = trees_parameters
         if feature_subsample_size is not None:
             self.feature_subsample_size = feature_subsample_size
@@ -214,10 +222,9 @@ class GradientBoostingRMSE:
         train_time = []
 
         current_preds_val = None
-        metric_val = None
+        metric_val = []
         if y_val is not None:
             current_preds_val = np.zeros_like(y_val)
-            metric_val = []
 
         ran = np.arange(0, X.shape[1])
 
@@ -288,11 +295,11 @@ class GradientBoostingRMSE:
         """
         prediction = np.zeros(shape=[X.shape[0], 1])
         ran = np.arange(0, X.shape[1])
-        for i, estimator, alpha in enumerate(zip(self.estimators, self.alphas)):
+        for i, (estimator, alpha) in enumerate(zip(self.estimators, self.alphas)):
             rand_gen = np.random.RandomState(i)
             rand_gen.shuffle(ran)
             features = ran[:int(X.shape[1] * self.feature_subsample_size)]
-            prediction += alpha * estimator.predict(X[:, features])
+            prediction += alpha * estimator.predict(X[:, features]).reshape(-1, 1)
 
         return prediction
 
