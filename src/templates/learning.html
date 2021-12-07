@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+<head xmlns="http://www.w3.org/1999/html">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width-device-width, initial-scale= 1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie-=edge">
+    <link rel="stylesheet" href="{{url_for('static', filename='css/style.css')}}">
+
+    <title>Обучение ансамблей</title>
+</head>
+<body>
+    <div class="box matovoye-steklo" style="align-content: center;
+                                            align-items: center;
+                                            justify-content: center;
+                                            margin-left: 8rem;
+                                            margin-bottom: -110px;
+                                            border: 4px mediumpurple solid;
+                                            ">
+        {{plot | safe}}
+    </div>
+    <div class="buttons" style="margin-bottom: -120px; margin-top: -0px">
+        <a class="button" style="background: lightsalmon;" href={{url_for("set_params")}}>
+                <p>&lArr; BACK TO PARAMS</p>
+        </a>
+        <a class="button" style="background: mediumaquamarine;" href={{url_for("load_model")}}>
+                <p> &#11015; DOWNLOAD MODEL</p>
+        </a>
+    </div>
+    <div class="buttons",style="margin-top: -40px">
+        <a class="button"  style="background: mediumpurple;" href={{url_for("info")}}>
+                <p>MORE INFO &#128269;</p>
+        </a>
+        <a class="button" style="background: mediumturquoise;" href={{url_for("test")}}>
+                <p>TEST &rArr;</p>
+        </a>
+    </div>
+</body>
+
+{% endblock %}
