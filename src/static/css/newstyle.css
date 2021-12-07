@@ -1,0 +1,125 @@
+body{
+  background-image: url("../img/bg.svg");
+  background-size: 110% auto;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  display: grid;
+}
+
+.matovoye-steklo {
+  content: "";
+  width: 30rem;
+  height: 45rem;
+  box-shadow: 0 0 1rem 0 rgba(0, 0, 0, 0.2);
+  border-radius: 7px;
+  position: relative;
+  z-index: 1;
+  background:inherit;
+  overflow: hidden;
+
+
+}
+p{
+  font-family: "Lucinda Grande", "Lucinda Sans Unicode", Helvetica, Arial, Verdana, sans-serif;
+}
+
+.matovoye-steklo:before {
+  content: "";
+  position: absolute;
+  text-align: center;
+  z-index: -1;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  box-shadow: inset 0 0 2000px rgba(255, 255, 255, 0.9);
+  filter: blur(130px);
+  margin: -20px;
+  padding: 100px 50px;
+}
+
+
+.container{
+  margin:80px auto;
+  width: 60px;
+  height: 60px;
+  position:relative;
+  transform-origin:center bottom;
+  animation-name: flicker;
+  animation-duration:2s;
+  animation-delay:200ms;
+  animation-timing-function: ease-in;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+
+.flame{
+  bottom:0;
+  margin-left: 50%;
+  margin-bottom: -30%;
+  position:absolute;
+  border-bottom-right-radius: 50%;
+  border-bottom-left-radius: 70%;
+  border-top-left-radius: 50%;
+  transform:rotate(-45deg) scale(1.5,1.5);
+}
+
+.yellow{
+  left:15px;
+  width: 50px;
+  height: 50px;
+  background:gold;
+  box-shadow: 0px 0px 9px 4px gold;
+}
+
+.orange{
+  left:10px;
+  width: 60px;
+  height: 60px;
+  background:orange;
+  box-shadow: 0px 0px 9px 4px orange;
+}
+
+.red{
+  left:5px;
+  width: 70px;
+  height: 70px;
+  background:OrangeRed;
+  box-shadow: 0px 0px 5px 4px OrangeRed;
+}
+
+.white{
+  left:15px;
+  bottom:-4px;
+  width: 50px;
+  height: 50px;
+  background:white;
+  box-shadow: 0px 0px 9px 4px white;
+}
+
+.circle{
+  border-radius: 50%;
+  position:absolute;
+}
+
+.blue{
+  width: 10px;
+  height: 10px;
+  left:25px;
+  bottom:-25px;
+  background: SlateBlue;
+  box-shadow: 0px 0px 15px 10px SlateBlue;
+}
+
+
+@keyframes flicker{
+  0%   {transform: rotate(-1deg);}
+  20%  {transform: rotate(1deg);}
+  40%  {transform: rotate(-1deg);}
+  60%  {transform: rotate(1deg) scaleY(1.04);}
+  80%  {transform: rotate(-2deg) scaleY(0.92);}
+  100% {transform: rotate(1deg);}
+}

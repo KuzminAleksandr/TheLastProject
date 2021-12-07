@@ -1,0 +1,59 @@
+body{
+  background-image: url("../img/bg.svg");
+  background-size: 110% auto;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  display: grid;
+}
+
+.matovoye-steklo {
+  content: "";
+  width: 70rem;
+  height: 38rem;
+  box-shadow: 0 0 1rem 0 rgba(0, 0, 0, 0.2);
+  border-radius: 7px;
+  position: relative;
+  z-index: 1;
+  background:inherit;
+  overflow: hidden;
+
+
+}
+p{
+  font-family: "Lucinda Grande", "Lucinda Sans Unicode", Helvetica, Arial, Verdana, sans-serif;
+}
+
+.matovoye-steklo:before {
+  content: "";
+  position: absolute;
+  text-align: center;
+  z-index: -1;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  box-shadow: inset 0 0 2000px rgba(255, 255, 255, 0.9);
+  filter: blur(130px);
+  margin: -20px;
+  padding: 100px 50px;
+}
+
+.buttons {
+  text-align: center;
+}
+
+.button {
+  color: black;
+  display: inline-block;
+  vertical-align: center;
+  width: 30%;
+  height: 25px;
+  line-height: 25px;
+  border-radius: 10px;
+  margin-left: 10%;
+  text-decoration: none;
+  text-align: center;
+}
