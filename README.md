@@ -27,18 +27,39 @@
 ```angular2html
 *
 |
-| --> src
+| --> src/
 |       | --> ensembles.py
 |       |       | --> RandomForestRMSE
 |       |       | --> GradientBoostingRMSE
+|       | --> start_flask.py
+|       | --> flask_utils.py
+|       | --> static/
+|       |       | --> css/
+|       |       |       | --> newstyle.css
+|       |       |       | --> style.css
+|       |       | --> datasets/
+|       |       | --> img/
+|       |       |       | --> bg.svg
+|       |       | --> model/
+|       | --> templates/
+|       |       | --> base.html
+|       |       | --> erros.html
+|       |       | --> gb_params.html
+|       |       | --> info.html
+|       |       | --> learning.html
+|       |       | --> loading.html
+|       |       | --> loading_test.html
+|       |       | --> rf_params.html
 |
-| --> scripts
+| --> scripts/
 |       | --> build.sh
 |       | --> run.sh
 |
 | --> Dockerfile
+| --> experiments.ipynb
 | --> Report.pdf
 | --> README.md
+| --> requirements.txt
 |
 *
 ```
