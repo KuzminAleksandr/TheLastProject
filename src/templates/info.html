@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block content %}
+<head xmlns="http://www.w3.org/1999/html">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width-device-width, initial-scale= 1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie-=edge">
+    <link rel="stylesheet" href="{{url_for('static', filename='css/newstyle.css')}}">
+
+    <title>Обучение ансамблей</title>
+</head>
+<body>
+    <div class="box matovoye-steklo" style="align-content: center;
+                                            align-items: center;
+                                            justify-content: left;
+                                            margin-left: 10rem;
+                                            margin-bottom: 5rem;
+                                            border: 2px mediumpurple solid;
+                                            text-align: left;
+                                            ">
+        <h2 style="color: black;
+                   text-align: center;
+                   background-color: mediumpurple;
+                   height: 60px;
+                   margin-top: 0px;
+                   margin-bottom: 10px;
+                   line-height: 60px">О МОДЕЛИ</h2>
+        <h4 style="margin-left: 10%" >&#10149;Модель: {{model_type}}</h4>
+        <h4 style="margin-left: 10%">&#10149;Количество деревьев в ансамбле: {{n_estimators}}</h4>
+        <h4 style="margin-left: 10%">&#10149;Максимальная глубина дерева: {{max_depth}}</h4>
+        <h4 style="margin-left: 10%">&#10149;Доля признаков при обучении: {{feature_subsample_size}}</h4>
+        {% if "learning_rate" in var_dict: %}
+        <h4 style="margin-left: 10%">&#10149;Learning rate: {{var_dict["learning_rate"]}}</h4>
+        {% endif %}
+        <h4 style="margin-left: 10%">
+            &#10149;Время обучения: {{var_dict["time_train"]}}
+        </h4>
+        <h4 style="margin-left: 10%">
+            &#10149;Лучшее значение метрики на тренировке: {{var_dict["best_train_score"]}}
+        </h4>
+        {% if 'best_valid_score' in var_dict: %}
+        <h4 style="margin-left: 10%">
+            &#10149;Лучшее значение метрики на валидации: {{var_dict["best_valid_score"]}}
+        </h4>
+        {% endif %}
+        <a  href={{url_for("load_info")}}>
+                <button type="submit" style="width: 65%;
+                                     height: 42px;
+                                     background: mediumpurple;
+                                     color: white;
+                                     border-radius: 10px;
+                                     margin: 30px 17%;
+                                     border: 0px;
+                                     margin-top: 0px;
+                                     box-shadow: inset 0 0 0px">
+                    <p>&#11015; DOWNLOAD TRAIN INFO</p>
+                </button>
+        </a>
+
+    </div>
+</body>
+
+{% endblock %}

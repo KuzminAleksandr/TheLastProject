@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+<head xmlns="http://www.w3.org/1999/html">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width-device-width, initial-scale= 1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie-=edge">
+    <link rel="stylesheet" href="{{url_for('static', filename='css/newstyle.css')}}">
+
+    <title>Обучение ансамблей</title>
+</head>
+<body>
+    <div class="container">
+      <div class="red flame"></div>
+      <div class="orange flame"></div>
+      <div class="yellow flame"></div>
+      <div class="white flame"></div>
+      <div class="black circle"></div>
+    </div>
+    <a href={{url_for('upload')}}>
+        <button type="submit" style="width: 120%;
+                                     text-align: center;
+                                     vertical-align: center;
+                                     height: 50px;
+                                     line-height: 50px;
+                                     background: linear-gradient(to top, gold, orange, darkorange) ;
+                                     color: white;
+                                     border-radius: 10px;
+                                     margin: 30px 17%;
+                                     margin-left: 28%;
+                                     margin-bottom: 50%;
+                                     margin-top: -130%;
+                                     border: 0px;
+                                     box-shadow: inset 0 0 0px">
+            <h1 style="margin-bottom: 50%; margin-top: -0%">START!</h1>
+        </button>
+    </a>
+</body>
+
+{% endblock %}
