@@ -1,17 +1,15 @@
-import pandas as pd
-import numpy as np
 import os
 import pickle
-import plotly.express as px
-import zipfile
 from collections import defaultdict
 
-
-from flask import Flask, render_template, send_file, redirect, url_for, flash
-from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, FileField, SelectField
-from wtforms.validators import DataRequired, InputRequired, Optional, ValidationError
+import numpy as np
+import pandas as pd
+import plotly.express as px
+from flask import Flask, render_template, send_file, redirect, url_for
 from flask_bootstrap import Bootstrap
+from flask_wtf import FlaskForm
+from wtforms import StringField, FileField, SelectField
+from wtforms.validators import DataRequired, InputRequired, ValidationError
 
 from ensembles import RandomForestRMSE, GradientBoostingRMSE
 from flask_utils import create_info_zip
@@ -22,9 +20,10 @@ app.config['BOOTSTRAP_SERVE_LOCAL'] = True
 UPLOAD_DIR = './src/static/datasets/'
 MODEL_DIR = './src/static/model/'
 Bootstrap(app)
-target_column = 'price'
+target_column = 'target'
 models = {'1': RandomForestRMSE, '2': GradientBoostingRMSE}
 var_dict = defaultdict()
+
 
 class DatasetForm(FlaskForm):
     train = FileField('Тренировочный датасет', validators=[DataRequired()])
@@ -58,6 +57,7 @@ class DatasetForm(FlaskForm):
             if set(self.train_columns) != set(valid_.columns):
                 os.remove(UPLOAD_DIR + valid.data.filename)
                 raise ValidationError(message="'Columns in valid dataset must match to train columns")
+
 
 class ParamsFormRF(FlaskForm):
     n_estimators = StringField('n_estimators', validators=[])
@@ -105,6 +105,7 @@ class ParamsFormRF(FlaskForm):
         else:
             var_dict["feature_subsample_size"] = None
 
+
 class ParamsFormGB(ParamsFormRF):
     learning_rate = StringField('learning_rate', validators=[])
 
@@ -123,18 +124,19 @@ class ParamsFormGB(ParamsFormRF):
             print("!!!!!!!!!")
             var_dict["learning_rate"] = None
 
+
 class DatasetTestForm(FlaskForm):
     test = FileField('Тестовый датасет', validators=[DataRequired()])
 
     def validate_test(self, test):
-            if test.data.filename[-4:] != ".csv":
-                raise ValidationError(message="File must have .csv format")
+        if test.data.filename[-4:] != ".csv":
+            raise ValidationError(message="File must have .csv format")
 
-            test.data.save(UPLOAD_DIR + test.data.filename)
-            test_ = pd.read_csv(UPLOAD_DIR + test.data.filename)
-            if set(var_dict["train_set"].drop(columns=target_column).columns) != set(test_.columns):
-                os.remove(UPLOAD_DIR + test.data.filename)
-                raise ValidationError(message="'Columns in test dataset must match to train columns except `target`")
+        test.data.save(UPLOAD_DIR + test.data.filename)
+        test_ = pd.read_csv(UPLOAD_DIR + test.data.filename)
+        if set(var_dict["train_set"].drop(columns=target_column).columns) != set(test_.columns):
+            os.remove(UPLOAD_DIR + test.data.filename)
+            raise ValidationError(message="'Columns in test dataset must match to train columns except `target`")
 
 
 @app.route('/', methods=["GET", "POST"])
@@ -171,7 +173,7 @@ def set_params():
         param_form = ParamsFormGB()
 
     if param_form.validate_on_submit():
-            return redirect(url_for('train_model'))
+        return redirect(url_for('train_model'))
 
     if len(param_form.errors) != 0:
         return render_template("errors.html", errors=param_form.errors)
@@ -180,6 +182,7 @@ def set_params():
         return render_template('rf_params.html', form=param_form)
     else:
         return render_template('gb_params.html', form=param_form)
+
 
 @app.route('/training-model')
 def train_model():
@@ -199,10 +202,10 @@ def train_model():
             learning_rate=var_dict["learning_rate"]
         )
     results = var_dict["model"].fit(
-        np.array(var_dict["train_set"].drop(columns=[target_column, 'date'])),
-        np.log(np.array(var_dict["train_set"][target_column])).reshape(-1),
-        np.array(var_dict["valid_set"].drop(columns=[target_column, 'date'])) if var_dict["name_valid"] != '' else None,
-        np.log(np.array(var_dict["valid_set"][target_column])).reshape(-1) if var_dict["name_valid"] != '' else None,
+        np.array(var_dict["train_set"].drop(columns=[target_column])),
+        np.array(var_dict["train_set"][target_column]).reshape(-1),
+        np.array(var_dict["valid_set"].drop(columns=[target_column])) if var_dict["name_valid"] != '' else None,
+        np.array(var_dict["valid_set"][target_column]).reshape(-1) if var_dict["name_valid"] != '' else None,
     )
 
     # Plot line chart
@@ -274,13 +277,14 @@ def train_model():
 def load_model():
     return send_file("." + MODEL_DIR[5:] + "model.pkl", as_attachment=True)
 
+
 @app.route('/training-model/test', methods=["GET", "POST"])
 def test():
     dataset_form = DatasetTestForm()
     if dataset_form.validate_on_submit():
         test_set = pd.read_csv(UPLOAD_DIR + dataset_form.test.data.filename)
 
-        preds = var_dict["model"].predict(test)
+        preds = var_dict["model"].predict(np.array(test_set))
         preds = pd.DataFrame(index=test_set.index, data=preds)
         preds.to_csv(UPLOAD_DIR + "test_predictions.csv")
         return send_file("." + UPLOAD_DIR[5:] + "test_predictions.csv")
