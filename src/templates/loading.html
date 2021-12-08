@@ -2,61 +2,61 @@
 {% block content %}
 <head xmlns="http://www.w3.org/1999/html">
     <meta charset="UTF-8">
-    <meta name="viewport" content="width-device-width, initial-scale= 1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie-=edge">
-    <link rel="stylesheet" href="{{url_for('static', filename='css/newstyle.css')}}">
+    <meta content="width-device-width, initial-scale= 1.0" name="viewport">
+    <meta content="ie-=edge" http-equiv="X-UA-Compatible">
+    <link href="{{url_for('static', filename='css/newstyle.css')}}" rel="stylesheet">
 
     <title>Обучение ансамблей</title>
 </head>
 <body>
-    <div class="box matovoye-steklo" style="align-content: center;
+<div class="box matovoye-steklo" style="align-content: center;
                                             align-items: center;
                                             justify-content: center;
                                             margin-left: 10rem;
                                             margin-bottom: 5rem;
                                             border: 2px mediumpurple solid;
                                             ">
-        <h2 style="color: black;
+    <h2 style="color: black;
                    text-align: center;
                    background-color: mediumpurple;
                    height: 60px;
                    margin-top: 0px;
                    line-height: 60px">Загрузка
-        </h2>
-        <form method="POST"
-              enctype="multipart/form-data"
-              name="train.csv"
-              style="margin: 5px 30px;
+    </h2>
+    <form enctype="multipart/form-data"
+          method="POST"
+          name="train.csv"
+          style="margin: 5px 30px;
                      text-align: left;
                      border-radius: 100px;
                      align-content: center;
                      color: black;
                      border: none">
-            <p style="color: black; text-align: left; margin-top: 20px; margin-left: 0px; margin-right: 15px">
+        <p style="color: black; text-align: left; margin-top: 20px; margin-left: 0px; margin-right: 15px">
             Тренировочный датасет: должен иметь формат .csv и колонку 'target' c целевой переменной.
-            </p>
-            {{ form.csrf_token }}
-            {{ form.train }}
-            <p style="color: black; text-align: left; margin-top: 20px; margin-left: 0px; margin-right: 15px">
-                Валидационный датасет: должен иметь формат .csv и набор признаков как и в тренировочном.
-            </p>
+        </p>
+        {{ form.csrf_token }}
+        {{ form.train }}
+        <p style="color: black; text-align: left; margin-top: 20px; margin-left: 0px; margin-right: 15px">
+            Валидационный датасет: должен иметь формат .csv и набор признаков как и в тренировочном.
+        </p>
 
-            {{ form.valid }}
+        {{ form.valid }}
 
-            <p style="color: black; margin-top: 20px; margin-left: 0px">Выберите модель:</p>
-            {{form.model_type}}
-            <button type="submit"  style="width: 65%;
+        <p style="color: black; margin-top: 20px; margin-left: 0px">Выберите модель:</p>
+        {{form.model_type}}
+        <button style="width: 65%;
                                      height: 25px;
                                      background: mediumpurple;
                                      color: white;
                                      border-radius: 10px;
                                      margin: 30px 17%;
                                      border: 0px;
-                                     box-shadow: inset 0 0 0px">
+                                     box-shadow: inset 0 0 0px" type="submit">
             <p>LET'S SET PARAMS</p>
-            </button>
-        </form>
-    </div>
+        </button>
+    </form>
+</div>
 </body>
 
 {% endblock %}

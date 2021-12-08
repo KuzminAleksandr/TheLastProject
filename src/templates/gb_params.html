@@ -2,51 +2,51 @@
 {% block content %}
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width-device-width, initial-scale= 1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie-=edge">
-    <link rel="stylesheet" href="{{url_for('static', filename='css/newstyle.css')}}">
+    <meta content="width-device-width, initial-scale= 1.0" name="viewport">
+    <meta content="ie-=edge" http-equiv="X-UA-Compatible">
+    <link href="{{url_for('static', filename='css/newstyle.css')}}" rel="stylesheet">
     <title>Обучение ансамблей</title>
 </head>
 <body>
-    <div class="box matovoye-steklo" style="align-content: center;
+<div class="box matovoye-steklo" style="align-content: center;
                                             align-items: center;
                                             justify-content: center;
                                             margin-left: 10rem;
                                             margin-bottom: 5rem;
                                             border: 2px lightsalmon solid;
                                             ">
-        <h2 style="color: black;
+    <h2 style="color: black;
                    text-align: center;
                    background-color: lightsalmon;
                    height: 60px;
                    margin-top: 0px;
                    line-height: 60px">Параметры
-        </h2>
-        <form method="POST"
-              enctype="multipart/form-data"
-              name="train.csv"
-              style="margin: 5px 30px;
+    </h2>
+    <form enctype="multipart/form-data"
+          method="POST"
+          name="train.csv"
+          style="margin: 5px 30px;
                      text-align: left;
                      border-radius: 100px;
                      align-content: center;
                      color: black;
                      border: none">
-            <p style="color: black; text-align: left; margin-top: 20px; margin-left: 0px; margin-right: 15px">
+        <p style="color: black; text-align: left; margin-top: 20px; margin-left: 0px; margin-right: 15px">
             Количество деревьев в ансамбле
-            </p>
-            {{ form.csrf_token }}
-            {{ form.n_estimators }}
-            <p style="color: black; text-align: left; margin-top: 20px; margin-left: 0px; margin-right: 15px">
-                Максимальная глубина деревьев
-            </p>
-            {{ form.max_depth }}
+        </p>
+        {{ form.csrf_token }}
+        {{ form.n_estimators }}
+        <p style="color: black; text-align: left; margin-top: 20px; margin-left: 0px; margin-right: 15px">
+            Максимальная глубина деревьев
+        </p>
+        {{ form.max_depth }}
 
-            <p style="color: black; margin-top: 20px; margin-left: 0px">Доля признаков в обучении</p>
-            {{form.feature_subsample_size}}
+        <p style="color: black; margin-top: 20px; margin-left: 0px">Доля признаков в обучении</p>
+        {{form.feature_subsample_size}}
 
-            <p style="color: black; margin-top: 20px; margin-left: 0px">Шаг обучения</p>
-            {{form.learning_rate}}
-            <button type="submit"  style="width: 65%;
+        <p style="color: black; margin-top: 20px; margin-left: 0px">Шаг обучения</p>
+        {{form.learning_rate}}
+        <button style="width: 65%;
                                      height: 25px;
                                      background: lightsalmon;
                                      color: white;
@@ -54,10 +54,10 @@
                                      margin: 50px 17%;
                                      margin-top: 19px;
                                      border: 0px;
-                                     box-shadow: inset 0 0 0px">
+                                     box-shadow: inset 0 0 0px" type="submit">
             <p>TRAIN MODEL</p>
-            </button>
-        </form>
-    </div>
+        </button>
+    </form>
+</div>
 </body>
 {% endblock %}

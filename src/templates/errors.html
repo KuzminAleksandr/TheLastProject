@@ -2,39 +2,40 @@
 {% block content %}
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width-device-width, initial-scale= 1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie-=edge">
-    <link rel="stylesheet" href="{{url_for('static', filename='css/newstyle.css')}}">
+    <meta content="width-device-width, initial-scale= 1.0" name="viewport">
+    <meta content="ie-=edge" http-equiv="X-UA-Compatible">
+    <link href="{{url_for('static', filename='css/newstyle.css')}}" rel="stylesheet">
     <title>Обучение ансамблей</title>
 </head>
 <body>
-    <div class="box matovoye-steklo" style="align-content: center;
+<div class="box matovoye-steklo" style="align-content: center;
                                             align-items: center;
                                             justify-content: center;
                                             margin-left: 10rem;
                                             margin-bottom: 5rem;
                                             border: 2px palevioletred solid;">
-        <h2 style="color: black;
+    <h2 style="color: black;
                    text-align: center;
                    background-color: palevioletred;
                    height: 60px;
                    margin-top: 0px;
                    line-height: 60px">
-            Ошибка!
-        </h2>
-        <h3 style="color: black; text-align: center">Кажется, введенные данные не верны!</h3>
-        {% for module, error in errors.items() %}
-        <ul style="margin-left: -10px">
-            <div class="alert alert-error" style="color: black">
-                <li>
+        Ошибка!
+    </h2>
+    <h3 style="color: black; text-align: center">Кажется, введенные данные не верны!</h3>
+    {% for module, error in errors.items() %}
+    <ul style="margin-left: -10px">
+        <div class="alert alert-error" style="color: black">
+            <li>
                 <h4>В аргументе '{{module}}' ошибка:
                     <br><h4 style="color: red">'{{error[0]}}.'</h4></br>
                 </h4>
-                </li>
-            </div>
+            </li>
+        </div>
         {% endfor %}
-        </ul>
-        <a href={{url_for('upload')}} style=" margin-bottom: 10%"><button style="width: 40%;
+    </ul>
+    <a href={{url_for('upload')}} style=" margin-bottom: 10%">
+        <button style="width: 40%;
                                                                          height: 45px;
                                                                          margin-left: 30%;
                                                                          margin-bottom: 10%;
@@ -43,7 +44,7 @@
                                                                          border-width: 0px">
             <p style="color: white;">Попробовать снова</p>
         </button>
-        </a>
-    </div>
+    </a>
+</div>
 </body>
 {% endblock %}
