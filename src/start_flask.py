@@ -259,7 +259,7 @@ def train_model():
         os.mkdir(UPLOAD_DIR + "results/")
     # Validation predictions
     if var_dict["name_valid"] != '':
-        preds = var_dict["model"].predict(np.array(var_dict["valid_set"].drop(columns=[target_column, "date"])))
+        preds = var_dict["model"].predict(np.array(var_dict["valid_set"].drop(columns=[target_column])))
         predictions_pd = pd.DataFrame(data=preds, columns=['predictions'], index=var_dict["valid_set"].index)
         predictions_pd.to_csv(UPLOAD_DIR + "/results/valid_predictions.csv")
 
