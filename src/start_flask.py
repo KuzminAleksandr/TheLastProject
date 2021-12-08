@@ -226,7 +226,6 @@ def train_model():
             axis=1
         )
     )
-
     fig = px.line(
         df,
         x="train_time",
@@ -246,7 +245,6 @@ def train_model():
             nticks=10,
         ),
     )
-
     # Save model
     if not os.path.exists(MODEL_DIR):
         os.mkdir(MODEL_DIR)
@@ -256,11 +254,9 @@ def train_model():
 
     if not os.path.exists(UPLOAD_DIR + "results/"):
         os.mkdir(UPLOAD_DIR + "results/")
-
     # Validation predictions
     if var_dict["name_valid"] != '':
         preds = var_dict["model"].predict(np.array(var_dict["valid_set"].drop(columns=[target_column, "date"])))
-        metric = var_dict["model"].get_metric(preds, np.array(var_dict["valid_set"][target_column]).reshape(-1))
         predictions_pd = pd.DataFrame(data=preds, columns=['predictions'], index=var_dict["valid_set"].index)
         predictions_pd.to_csv(UPLOAD_DIR + "/results/valid_predictions.csv")
 
@@ -318,4 +314,4 @@ def load_info():
 
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port='5000', debug=False)
+    app.run(host='0.0.0.0', port='5000', debug=True)
