@@ -50,11 +50,8 @@
 |       |       | --> loading.html
 |       |       | --> loading_test.html
 |       |       | --> rf_params.html
-|
-| --> scripts/
-|       | --> build.sh
-|       | --> run.sh
-|
+| 
+| --> run.sh
 | --> Dockerfile
 | --> experiments.ipynb
 | --> Report.pdf
