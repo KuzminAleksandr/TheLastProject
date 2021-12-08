@@ -19,7 +19,8 @@ from flask_utils import create_info_zip
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'hello'
 app.config['BOOTSTRAP_SERVE_LOCAL'] = True
-UPLOAD_DIR = './static/datasets/'
+UPLOAD_DIR = './src/static/datasets/'
+MODEL_DIR = './src/static/model/'
 Bootstrap(app)
 target_column = 'price'
 models = {'1': RandomForestRMSE, '2': GradientBoostingRMSE}
@@ -37,7 +38,9 @@ class DatasetForm(FlaskForm):
     def validate_train(self, train):
         if train.data.filename[-4:] != ".csv":
             raise ValidationError(message="File must have .csv format")
-
+        if not os.path.exists(UPLOAD_DIR):
+            print(os.listdir())
+            os.mkdir(UPLOAD_DIR[1:])
         train.data.save(UPLOAD_DIR + train.data.filename)
         train_ = pd.read_csv(UPLOAD_DIR + train.data.filename)
         self.train_columns = train_.columns
@@ -145,12 +148,12 @@ def upload():
     if dataset_form.validate_on_submit():
         var_dict["model_type"] = dataset_form.model_type.data
 
-        var_dict["train_set"] = pd.read_csv(f"./static/datasets/{dataset_form.train.data.filename}")
+        var_dict["train_set"] = pd.read_csv(UPLOAD_DIR + dataset_form.train.data.filename)
         var_dict["name_train"] = dataset_form.train.data.filename
 
         var_dict["name_valid"] = dataset_form.valid.data.filename
         if var_dict["name_valid"] != '':
-            var_dict["valid_set"] = pd.read_csv(f"./static/datasets/{dataset_form.valid.data.filename}")
+            var_dict["valid_set"] = pd.read_csv(UPLOAD_DIR + dataset_form.valid.data.filename)
 
         return redirect(url_for('set_params'))
 
@@ -232,7 +235,7 @@ def train_model():
         color="group",
         line_group="group",
         category_orders={"metric": [str(x) for x in reversed(np.sort(df.metric))]},
-        labels=dict(train_time='Время тренировкиб, сек.', metric='Метрика', group='Стадия'),
+        labels=dict(train_time='Время тренировки, сек.', metric='Метрика', group='Стадия'),
         height=400
     )
     fig.update_layout(
@@ -245,10 +248,10 @@ def train_model():
     )
 
     # Save model
-    if not os.path.exists("./static/model/"):
-        os.mkdir('./static/model/')
+    if not os.path.exists(MODEL_DIR):
+        os.mkdir(MODEL_DIR)
 
-    with open("./static/model/model.pkl", "wb") as f:
+    with open(MODEL_DIR + "model.pkl", "wb") as f:
         pickle.dump(var_dict["model"], f)
 
     if not os.path.exists(UPLOAD_DIR + "results/"):
@@ -273,18 +276,18 @@ def train_model():
 
 @app.route('/training-mode/load-model', methods=['GET', 'POST'])
 def load_model():
-    return send_file("./static/model/model.pkl", as_attachment=True)
+    return send_file("." + MODEL_DIR[5:] + "model.pkl", as_attachment=True)
 
 @app.route('/training-model/test', methods=["GET", "POST"])
 def test():
     dataset_form = DatasetTestForm()
     if dataset_form.validate_on_submit():
-        test_set = pd.read_csv(f"./static/datasets/{dataset_form.test.data.filename}")
+        test_set = pd.read_csv(UPLOAD_DIR + dataset_form.test.data.filename)
 
         preds = var_dict["model"].predict(test)
         preds = pd.DataFrame(index=test_set.index, data=preds)
-        preds.to_csv("./static/datasets/predictions.csv")
-        return send_file(UPLOAD_DIR + "test_predictions.csv")
+        preds.to_csv(UPLOAD_DIR + "test_predictions.csv")
+        return send_file("." + UPLOAD_DIR[5:] + "test_predictions.csv")
 
     if len(dataset_form.errors) != 0:
         return render_template("errors.html", errors=dataset_form.errors)
@@ -297,7 +300,7 @@ def info():
     if "learning_rate" in var_dict:
         var_dict["learning_rate"] = var_dict["model"].learning_rate
 
-    create_info_zip(var_dict, UPLOAD_DIR)
+    create_info_zip(var_dict, UPLOAD_DIR, MODEL_DIR)
 
     return render_template(
         'info.html',
@@ -311,8 +314,8 @@ def info():
 
 @app.route('/training-model/load_info', methods=["GET", "POST"])
 def load_info():
-    return send_file('./static/datasets/results/info.zip', as_attachment=True)
+    return send_file("." + UPLOAD_DIR[5:] + 'results/info.zip', as_attachment=True)
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port='5000', debug=False)

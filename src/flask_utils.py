@@ -1,12 +1,14 @@
 import zipfile
+import os
 
 
-def create_info_zip(var_dict, UPLOAD_DIR):
+def create_info_zip(var_dict, UPLOAD_DIR, MODEL_DIR):
     # ZIP train files
     with zipfile.ZipFile(UPLOAD_DIR + "results/info.zip", "w") as file:
-        file.write(UPLOAD_DIR + "results/valid_predictions.csv")
+        if os.path.exists(UPLOAD_DIR + "results/valid_predictions.csv"):
+            file.write(UPLOAD_DIR + "results/valid_predictions.csv")
         file.write(UPLOAD_DIR + "results/train_valid_history.csv")
-        file.write("./static/model/model.pkl")
+        file.write(MODEL_DIR + "model.pkl")
         with open(UPLOAD_DIR + "results/params.txt", "w") as params:
             put_params(params, var_dict)
         file.write(UPLOAD_DIR + "results/params.txt")
