@@ -43,6 +43,9 @@
 |       |       | --> model/
 |       | --> templates/
 |       |       | --> (...HTML files...)
+|       
+| --> scripts/
+|       | --> build.sh
 |
 | --> Dockerfile
 | --> experiments.ipynb
